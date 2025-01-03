@@ -1,3 +1,5 @@
+import { Logger } from '../commons/utils';
+
 @Entry
 @Component
 struct Index {
@@ -5,13 +7,16 @@ struct Index {
 
   build() {
     RelativeContainer() {
-      Text(this.message)
+      Button(this.message)
         .id('HelloWorld')
         .fontSize(50)
         .fontWeight(FontWeight.Bold)
         .alignRules({
           center: { anchor: '__container__', align: VerticalAlign.Center },
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
+        })
+        .onClick(() => {
+          Logger.info('测试1', '测试2', '测试3')
         })
     }
     .height('100%')
