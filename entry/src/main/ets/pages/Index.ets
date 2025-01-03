@@ -1,4 +1,4 @@
-import { Logger } from '../commons/utils';
+import { FullScreen, Logger } from '../commons/utils';
 
 @Entry
 @Component
@@ -9,17 +9,20 @@ struct Index {
     RelativeContainer() {
       Button(this.message)
         .id('HelloWorld')
-        .fontSize(50)
-        .fontWeight(FontWeight.Bold)
         .alignRules({
           center: { anchor: '__container__', align: VerticalAlign.Center },
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
         .onClick(() => {
-          Logger.info('测试1', '测试2', '测试3')
+          try {
+            FullScreen.status ? FullScreen.disable() : FullScreen.enable();
+          } catch (e) {
+            Logger.error(e);
+          }
         })
     }
     .height('100%')
     .width('100%')
+    .backgroundColor(Color.Pink)
   }
 }
