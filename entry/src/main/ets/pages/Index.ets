@@ -1,4 +1,4 @@
-import { FullScreen, Logger } from '../commons/utils';
+import { Logger, StatusBar } from '../commons/utils';
 
 @Entry
 @Component
@@ -14,15 +14,11 @@ struct Index {
           middle: { anchor: '__container__', align: HorizontalAlign.Center }
         })
         .onClick(() => {
-          try {
-            FullScreen.status ? FullScreen.disable() : FullScreen.enable();
-          } catch (e) {
-            Logger.error(e);
-          }
+          StatusBar.setLightBar();
         })
     }
     .height('100%')
     .width('100%')
-    .backgroundColor(Color.Pink)
+    .backgroundColor(Color.Black)
   }
 }
