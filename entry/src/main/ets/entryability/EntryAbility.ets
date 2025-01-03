@@ -1,7 +1,6 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
-import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
-import { Logger } from '../commons/utils';
+import { FullScreen, Logger } from '../commons/utils';
 
 export default class EntryAbility extends UIAbility {
   onCreate(_: Want, __: AbilityConstant.LaunchParam): void {
@@ -18,12 +17,14 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     Logger.info('Ability onWindowStageCreate');
 
+    FullScreen.enable(); // 默认开启全屏
+
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
-        hilog.error(0x0000, 'testTag', 'Failed to load the content. Cause: %{public}s', JSON.stringify(err) ?? '');
+        Logger.error(`Failed to load the content. Cause: ${JSON.stringify(err) ?? ''}`);
         return;
       }
-      hilog.info(0x0000, 'testTag', 'Succeeded in loading the content.');
+      Logger.info('Succeeded in loading the content.');
     });
   }
 

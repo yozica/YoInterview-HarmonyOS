@@ -3,6 +3,9 @@ import { window } from '@kit.ArkUI';
 class FullScreen {
   static status: boolean = false;
 
+  private constructor() {
+  }
+
   private static async changeStatus(status: boolean): Promise<window.Window> {
     const ctx = AppStorage.get<Context>('context');
 
