@@ -2,26 +2,31 @@ import hilog from '@ohos.hilog';
 
 class Logger {
   private static domain: number = 0x1234;
-  private static prefix: string = "yo_interview_logger";
-  private static format: string = '%{public}s, %{public}s';
+  private static tag: string = "yo_interview_logger";
 
   private constructor() {
   }
 
+  private static assign(...args: string[]) {
+    return args.reduce((preValue, curValue) => {
+      return preValue + ' ' + curValue;
+    }, '')
+  }
+
   static debug(...args: string[]) {
-    hilog.debug(Logger.domain, Logger.prefix, Logger.format, args);
+    hilog.debug(Logger.domain, Logger.tag, Logger.assign(...args));
   }
 
   static info(...args: string[]): void {
-    hilog.info(Logger.domain, Logger.prefix, Logger.format, args);
+    hilog.info(Logger.domain, Logger.tag, Logger.assign(...args));
   }
 
   static warn(...args: string[]): void {
-    hilog.warn(Logger.domain, Logger.prefix, Logger.format, args);
+    hilog.warn(Logger.domain, Logger.tag, Logger.assign(...args));
   }
 
   static error(...args: string[]): void {
-    hilog.error(Logger.domain, Logger.prefix, Logger.format, args);
+    hilog.error(Logger.domain, Logger.tag, Logger.assign(...args));
   }
 }
 
