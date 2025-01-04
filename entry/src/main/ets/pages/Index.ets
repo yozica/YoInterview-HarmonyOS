@@ -13,7 +13,6 @@ interface TabItem {
 @Component
 struct Index {
   // 安全区域
-  @StorageProp('topArea') topArea: number = 0
   @StorageProp('bottomArea') bottomArea: number = 0
   // 当前tab页
   @State curIndex: number = 0;
@@ -56,7 +55,8 @@ struct Index {
       }
       .scrollable(false)
       .animationMode(AnimationMode.NO_ANIMATION)
-      .margin({ top: this.topArea, bottom: this.bottomArea })
+      .margin({ bottom: this.bottomArea })
+      .divider({ strokeWidth: 0.5, color: $r('app.color.common_gray_border') })
     }
     .height('100%')
     .width('100%')
