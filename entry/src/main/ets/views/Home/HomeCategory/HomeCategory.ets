@@ -1,25 +1,28 @@
 import type { QuestionType } from "../../../models";
 import { QuestionListComp } from '../../../commons/components';
+import request from '../../../commons/utils/request'
 
 @Component
 struct HomeCategory {
   @State activeIndex: number = 0;
-  @State questionList: QuestionType[] = [
-    { id: 1, name: 'ArkTS', displayNewestFlag: 0 },
-    { id: 2, name: 'ArkUI', displayNewestFlag: 1 },
-    { id: 3, name: 'Hap', displayNewestFlag: 1 },
-    { id: 4, name: 'Hsp', displayNewestFlag: 0 },
-    { id: 5, name: 'Har', displayNewestFlag: 0 },
-    { id: 6, name: 'Ability', displayNewestFlag: 0 },
-    { id: 7, name: 'Stage', displayNewestFlag: 0 },
-    { id: 8, name: 'Kit', displayNewestFlag: 0 }
-  ];
+  @State questionTypeList: QuestionType[] = [];
+
+  aboutToAppear(): void {
+    this.getQuestionTypeList();
+  }
+
+  async getQuestionTypeList() {
+    const res = await request<QuestionType[]>({
+      url: "/question/type",
+    });
+    this.questionTypeList = [...res];
+  }
 
   @Builder
-  tabbarBuilder(question: QuestionType, index: number) {
+  tabbarBuilder(questionType: QuestionType, index: number) {
     Row({ space: 4 }) {
       Stack({ alignContent: Alignment.Bottom }) {
-        Text(question.name)
+        Text(questionType.name)
           .fontSize(15)
           .height(44)
           .fontColor(this.activeIndex === index ? $r('app.color.black') : $r('app.color.common_gray_02'))
@@ -30,7 +33,7 @@ struct HomeCategory {
           .backgroundColor($r('app.color.black'))
       }
 
-      if (question.displayNewestFlag) {
+      if (questionType.displayNewestFlag) {
         Image($r('app.media.ic_home_new'))
           .width(32)
           .height(14)
@@ -38,17 +41,17 @@ struct HomeCategory {
           .margin({ left: 4 })
       }
     }
-    .padding({ left: 16, right: index === this.questionList.length - 1 ? 16 : 0 })
+    .padding({ left: 16, right: index === this.questionTypeList.length - 1 ? 16 : 0 })
   }
 
   build() {
     Column() {
       Tabs({ index: $$this.activeIndex }) {
-        ForEach(this.questionList, (question: QuestionType, index) => {
+        ForEach(this.questionTypeList, (questionType: QuestionType, index) => {
           TabContent() {
-            QuestionListComp()
+            QuestionListComp({ typeId: questionType.id })
           }
-          .tabBar(this.tabbarBuilder(question, index))
+          .tabBar(this.tabbarBuilder(questionType, index))
         })
       }
       .scrollable(true)

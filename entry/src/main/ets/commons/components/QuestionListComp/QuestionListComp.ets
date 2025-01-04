@@ -1,33 +1,54 @@
 import QuestionItemComp from '../QuestionItemComp/QuestionItemComp'
+import request from '../../utils/request';
+import { PageData, QuestionItem, QuestionListParams, SortType } from '../../../models';
 
 @Component
 struct QuestionListComp {
-  @Prop list: number[] = []
+  @Prop typeId: number;
+  @Prop sort: SortType = SortType.Default;
+  @State list: QuestionItem[] = [];
   @State isRefreshing: boolean = false;
   @State isLoading: boolean = false;
   @State isFinish: boolean = false;
+  @State page: number = 1;
+  @State pageSize: number = 10;
 
-  aboutToAppear(): void {
-    this.list = Array(10).fill(0);
+  async getQuestionList() {
+    const res = await request<PageData<QuestionItem>>({
+      url: "/question/list",
+      params: {
+        type: this.typeId,
+        questionBankType: 10,
+        sort: this.sort,
+        page: this.page,
+        pageSize: this.pageSize
+      } as QuestionListParams
+    })
+    return res;
   }
 
-  onRefresh() {
-    setTimeout(() => {
-      this.list = Array(10).fill(0);
-      this.isRefreshing = false
-    }, 3000)
+  async onLoad(isRefresh = false) {
+    if (this.isFinish || this.isLoading || this.isRefreshing) return;
+    this.isLoading = true;
+    const res = await this.getQuestionList();
+    isRefresh ? (this.list = [...res.rows]) : this.list.push(...res.rows);
+    this.isLoading = false;
+    if (this.list.length >= res.total) {
+      this.isFinish = true;
+    } else {
+      this.page++;
+    }
+  }
+
+  async onRefresh() {
+    this.page = 1;
+    this.isFinish = false;
+    this.isRefreshing = false;
+    await this.onLoad(true);
   }
 
   onReachEnd() {
-    if (this.isFinish || this.isLoading || this.isRefreshing) return
-    this.isLoading = true
-    setTimeout(() => {
-      this.list = [...this.list, ...Array(10).fill(0)]
-      if (this.list.length >= 40) {
-        this.isFinish = true
-      }
-      this.isLoading = false
-    }, 3000)
+    this.onLoad();
   }
 
   @Builder
@@ -59,17 +80,8 @@ struct QuestionListComp {
   build() {
     Refresh({ refreshing: $$this.isRefreshing }) {
       List() {
-        ForEach(this.list, (_: number) => {
-          QuestionItemComp({
-            item: {
-              id: '100',
-              stem: "请说下ArkUI的容器组件有哪些？",
-              difficulty: 3,
-              likeCount: 23,
-              views: 432,
-              readFlag: 1
-            }
-          })
+        ForEach(this.list, (question: QuestionItem) => {
+          QuestionItemComp({ item: question })
         })
         // 加载更多
         this.loadMoreBuilder()

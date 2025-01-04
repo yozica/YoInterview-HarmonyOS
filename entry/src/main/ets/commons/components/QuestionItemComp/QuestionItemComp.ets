@@ -1,6 +1,5 @@
 import { YoTag } from "..";
-import { QuestionItem, TempObject } from "../../../models";
-
+import { QuestionItem } from "../../../models";
 
 @Component
 struct QuestionItemComp {

@@ -11,6 +11,7 @@ interface ResType<T> {
 interface RequestOptions<Req> {
   url: string;
   method?: "GET" | "POST";
+  params?: object;
   data?: Req;
 }
 
@@ -23,6 +24,7 @@ const request = async<Res, Req = Object>(options: RequestOptions<Req>) => {
   const response = await service<null, AxiosResponse<ResType<Res>, Req>, Req>({
     url: options.url,
     method: options.method || "GET",
+    params: options.params,
     data: options.data,
   });
 
