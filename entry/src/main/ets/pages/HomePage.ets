@@ -1,4 +1,5 @@
 import { YoSearchBox, YoClockIn } from "../commons/components"
+import { HomeCategory } from "../views/Home"
 
 @Component
 struct HomePage {
@@ -42,6 +43,8 @@ struct HomePage {
       .autoPlay(true)
       .indicator(DotIndicator.dot().selectedColor($r('app.color.white')))
       .margin({ bottom: 16 })
+
+      HomeCategory()
     }
     .width('100%')
     .height('100%')
