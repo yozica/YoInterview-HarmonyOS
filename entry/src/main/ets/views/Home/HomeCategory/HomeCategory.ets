@@ -1,9 +1,9 @@
-import { YoTag } from "../../../commons/components"
-import type { QuestionType } from "../../../models"
+import type { QuestionType } from "../../../models";
+import { QuestionListComp } from '../../../commons/components';
 
 @Component
 struct HomeCategory {
-  @State activeIndex: number = 0
+  @State activeIndex: number = 0;
   @State questionList: QuestionType[] = [
     { id: 1, name: 'ArkTS', displayNewestFlag: 0 },
     { id: 2, name: 'ArkUI', displayNewestFlag: 1 },
@@ -13,7 +13,7 @@ struct HomeCategory {
     { id: 6, name: 'Ability', displayNewestFlag: 0 },
     { id: 7, name: 'Stage', displayNewestFlag: 0 },
     { id: 8, name: 'Kit', displayNewestFlag: 0 }
-  ]
+  ];
 
   @Builder
   tabbarBuilder(question: QuestionType, index: number) {
@@ -46,14 +46,7 @@ struct HomeCategory {
       Tabs({ index: $$this.activeIndex }) {
         ForEach(this.questionList, (question: QuestionType, index) => {
           TabContent() {
-            Column() {
-              YoTag({ difficulty: 1 })
-              YoTag({ difficulty: 2 })
-              YoTag({ difficulty: 3 })
-              YoTag({ difficulty: 4 })
-              YoTag({ difficulty: 5 })
-              YoTag({ text: "测试", color: Color.Red })
-            }
+            QuestionListComp()
           }
           .tabBar(this.tabbarBuilder(question, index))
         })
