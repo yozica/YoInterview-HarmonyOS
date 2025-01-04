@@ -1,4 +1,4 @@
-import { YoSearchBox } from "../commons/components"
+import { YoSearchBox, YoClockIn } from "../commons/components"
 
 @Component
 struct HomePage {
@@ -11,6 +11,7 @@ struct HomePage {
           .width(24)
           .aspectRatio(1)
         YoSearchBox({ layoutWeightValue: 1 })
+        YoClockIn()
       }
       .padding({ left: 16, right: 16 })
       .width('100%')
