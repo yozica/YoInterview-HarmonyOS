@@ -2,12 +2,15 @@ import HomePage from './HomePage';
 import ProjectPage from './ProjectPage';
 import InterviewPage from './InterviewPage';
 import MinePage from './MinePage';
+import { auth } from '../commons/utils/Auth';
 
 interface TabItem {
   name: string;
   icon: ResourceStr;
   activeIcon: ResourceStr;
 }
+
+auth.initUser();
 
 @Entry
 @Component
