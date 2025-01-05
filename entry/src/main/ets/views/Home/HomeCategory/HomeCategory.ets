@@ -1,5 +1,5 @@
 import { QuestionType, SortType } from "../../../models";
-import { QuestionListComp } from '../../../commons/components';
+import { QuestionListComp, YoSkeleton, YoSkeletonItem } from '../../../commons/components';
 import request from '../../../commons/utils/request';
 import { FilterButton } from './components';
 import { LengthMetrics, LengthUnit } from "@kit.ArkUI";
@@ -20,6 +20,7 @@ struct HomeCategory {
   @State activeIndex: number = 0;
   @State targetIndex: number = 0;
   @State sort: SortType = SortType.Default;
+  @State loading: boolean = false;
   @State questionTypeList: QuestionType[] = [];
   @State sheetShow: boolean = false;
   // 筛选sheet所需的状态
@@ -31,10 +32,12 @@ struct HomeCategory {
   }
 
   async getQuestionTypeList() {
+    this.loading = true;
     const res = await request<QuestionType[]>({
       url: "/question/type",
     });
     this.questionTypeList = [...res];
+    this.loading = false;
   }
 
   @Builder
@@ -168,44 +171,81 @@ struct HomeCategory {
     .backgroundColor($r('app.color.white'))
   }
 
-  build() {
-    Stack({ alignContent: Alignment.TopEnd }) {
-      Tabs({ index: $$this.activeIndex }) {
-        ForEach(this.questionTypeList, (questionType: QuestionType, index) => {
-          TabContent() {
-            QuestionListComp({
-              typeId: questionType.id,
-              sort: this.sort,
-            })
+  @Builder
+  filterButtonBuilder() {
+    Row() {
+      Image($r('app.media.ic_home_filter'))
+        .width(24)
+        .aspectRatio(1)
+        .onClick(() => {
+          this.filterDataIndex = this.activeIndex;
+          this.filterDataSort = this.sort;
+          this.sheetShow = !this.sheetShow;
+        })
+    }
+    .width(56)
+    .height(55)
+    .justifyContent(FlexAlign.Center)
+    .alignItems(VerticalAlign.Center)
+    .linearGradient({
+      angle: 90,
+      colors: [['#00ffffff', 0], ['#ffffff', 0.285]]
+    })
+  }
+
+  @Builder
+  skeletonBuilder() {
+    YoSkeleton() {
+      Column() {
+        Row({ space: 16 }) {
+          YoSkeletonItem({ widthValue: 50 })
+          YoSkeletonItem({ widthValue: 80 })
+          YoSkeletonItem({ widthValue: 60 })
+          YoSkeletonItem({ widthValue: 50 })
+        }
+        .width('100%')
+        .height(44)
+
+        ForEach(Array(5).fill(0), () => {
+          Column({ space: 10 }) {
+            YoSkeletonItem({ widthValue: '90%' })
+            YoSkeletonItem({ widthValue: '50%' })
           }
-          .tabBar(this.tabbarBuilder(questionType, index))
+          .width('100%')
+          .height(80)
+          .alignItems(HorizontalAlign.Start)
         })
       }
-      .scrollable(true)
-      .divider({ strokeWidth: 0.5, color: $r('app.color.common_gray_border') })
-      .barMode(BarMode.Scrollable)
-      .onAnimationStart((_: number, target: number) => {
-        this.targetIndex = target;
-      })
+      .width('100%')
+      .padding({ left: 16, right: 16 })
+    }
+  }
 
-      Row() {
-        Image($r('app.media.ic_home_filter'))
-          .width(24)
-          .aspectRatio(1)
-          .onClick(() => {
-            this.filterDataIndex = this.activeIndex;
-            this.filterDataSort = this.sort;
-            this.sheetShow = !this.sheetShow;
+  build() {
+    Stack({ alignContent: Alignment.TopEnd }) {
+      if (this.loading) {
+        this.skeletonBuilder()
+      } else {
+        Tabs({ index: $$this.activeIndex }) {
+          ForEach(this.questionTypeList, (questionType: QuestionType, index) => {
+            TabContent() {
+              QuestionListComp({
+                typeId: questionType.id,
+                sort: this.sort,
+              })
+            }
+            .tabBar(this.tabbarBuilder(questionType, index))
           })
+        }
+        .scrollable(true)
+        .divider({ strokeWidth: 0.5, color: $r('app.color.common_gray_border') })
+        .barMode(BarMode.Scrollable)
+        .onAnimationStart((_: number, target: number) => {
+          this.targetIndex = target;
+        })
+
+        this.filterButtonBuilder()
       }
-      .width(56)
-      .height(55)
-      .justifyContent(FlexAlign.Center)
-      .alignItems(VerticalAlign.Center)
-      .linearGradient({
-        angle: 90,
-        colors: [['#00ffffff', 0], ['#ffffff', 0.285]]
-      })
     }
     .width('100%')
     .layoutWeight(1)
