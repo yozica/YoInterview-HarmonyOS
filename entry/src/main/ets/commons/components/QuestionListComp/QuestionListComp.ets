@@ -5,13 +5,19 @@ import { PageData, QuestionItem, QuestionListParams, SortType } from '../../../m
 @Component
 struct QuestionListComp {
   @Prop typeId: number;
-  @Prop sort: SortType = SortType.Default;
+  @Watch('watchSort')
+  @Prop
+  sort: SortType = SortType.Default;
   @State list: QuestionItem[] = [];
   @State isRefreshing: boolean = false;
   @State isLoading: boolean = false;
   @State isFinish: boolean = false;
   @State page: number = 1;
   @State pageSize: number = 10;
+
+  watchSort() {
+    this.isRefreshing = true;
+  }
 
   async getQuestionList() {
     const res = await request<PageData<QuestionItem>>({
@@ -28,7 +34,6 @@ struct QuestionListComp {
   }
 
   async onLoad(isRefresh = false) {
-    if (this.isFinish || this.isLoading || this.isRefreshing) return;
     this.isLoading = true;
     const res = await this.getQuestionList();
     isRefresh ? (this.list = [...res.rows]) : this.list.push(...res.rows);
@@ -41,13 +46,15 @@ struct QuestionListComp {
   }
 
   async onRefresh() {
+    if (this.isLoading) return;
     this.page = 1;
     this.isFinish = false;
-    this.isRefreshing = false;
     await this.onLoad(true);
+    this.isRefreshing = false;
   }
 
   onReachEnd() {
+    if (this.isFinish || this.isLoading || this.isRefreshing) return;
     this.onLoad();
   }
 
