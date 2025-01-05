@@ -173,6 +173,9 @@ struct MinePage {
             .textOverflow({ overflow: TextOverflow.Ellipsis })
             .layoutWeight(1)
             .onClick(() => {
+              router.pushUrl({
+                url: "pages/LoginPage"
+              })
             })
         }
         YoClockIn({ clockInCount: 10 })
