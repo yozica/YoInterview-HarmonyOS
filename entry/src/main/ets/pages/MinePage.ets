@@ -226,6 +226,12 @@ struct MinePage {
             })
           })
       }
+      Button('模拟token失效')
+        .onClick(() => {
+          const user = auth.getUser();
+          user.token = Date.now().toString()
+          auth.setUser(user);
+        })
     }
     .width('100%')
     .height('100%')

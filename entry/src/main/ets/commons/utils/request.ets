@@ -1,6 +1,7 @@
-import axios, { AxiosError, AxiosProxyConfig, AxiosRequestConfig, InternalAxiosRequestConfig } from '@ohos/axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from '@ohos/axios';
 import type { AxiosResponse } from '@ohos/axios';
 import { auth } from './Auth';
+import { promptAction, router } from '@kit.ArkUI';
 
 interface ResType<T> {
   code: 10000 | number;
@@ -23,11 +24,30 @@ const service = axios.create({
 
 service.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
-    config.headers['Authorization'] = 'Bearer ' + auth.getUser().token;
+    const user = auth.getUser();
+    if (user.token) {
+      config.headers['Authorization'] = 'Bearer ' + user.token;
+    }
     return config;
   },
   (err: AxiosError) => {
-    return Promise.reject(AxiosError);
+    return Promise.reject(err);
+  }
+)
+
+service.interceptors.response.use(
+  (response: AxiosResponse) => {
+    return response;
+  },
+  (err: AxiosError) => {
+    if (err.response?.status === 401) {
+      auth.clear();
+      router.pushUrl({
+        url: 'pages/LoginPage'
+      }, router.RouterMode.Single);
+      promptAction.showToast({ message: "登录失效" });
+    }
+    return Promise.reject(err);
   }
 )
 

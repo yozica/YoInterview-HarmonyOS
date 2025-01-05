@@ -33,10 +33,13 @@ struct HomeCategory {
 
   async getQuestionTypeList() {
     this.loading = true;
-    const res = await request<QuestionType[]>({
-      url: "/question/type",
-    });
-    this.questionTypeList = [...res];
+    try {
+      const res = await request<QuestionType[]>({
+        url: "/question/type",
+      });
+      this.questionTypeList = [...res];
+    } catch {
+    }
     this.loading = false;
   }
 

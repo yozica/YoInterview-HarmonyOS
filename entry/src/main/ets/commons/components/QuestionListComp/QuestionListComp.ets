@@ -35,14 +35,17 @@ struct QuestionListComp {
 
   async onLoad(isRefresh = false) {
     this.isLoading = true;
-    const res = await this.getQuestionList();
-    isRefresh ? (this.list = [...res.rows]) : this.list.push(...res.rows);
-    this.isLoading = false;
-    if (this.list.length >= res.total) {
-      this.isFinish = true;
-    } else {
-      this.page++;
+    try {
+      const res = await this.getQuestionList();
+      isRefresh ? (this.list = [...res.rows]) : this.list.push(...res.rows);
+      if (this.list.length >= res.total) {
+        this.isFinish = true;
+      } else {
+        this.page++;
+      }
+    } catch {
     }
+    this.isLoading = false;
   }
 
   async onRefresh() {
