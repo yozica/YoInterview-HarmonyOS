@@ -1,6 +1,9 @@
 import { YoClockIn } from '../commons/components';
 import { router } from '@kit.ArkUI';
-import { Logger, StatusBar } from '../commons/utils';
+import { StatusBar } from '../commons/utils';
+import { User } from '../models';
+import { formatTime } from '../commons/utils/common';
+import { auth, Auth } from '../commons/utils/Auth';
 
 interface ClickElement {
   icon: ResourceStr;
@@ -15,34 +18,6 @@ interface Nav extends ClickElement {
 interface Tool extends ClickElement {
   value?: string;
 }
-
-const navs: Nav[] = [
-  {
-    icon: $r('app.media.ic_mine_history'),
-    name: "历史记录",
-    onClick: () => {
-    }
-  },
-  {
-    icon: $r('app.media.ic_mine_collect'),
-    name: "我的收藏",
-    onClick: () => {
-    }
-  },
-  {
-    icon: $r('app.media.ic_mine_like'),
-    name: "我的点赞",
-    onClick: () => {
-    }
-  },
-  {
-    icon: $r('app.media.ic_mine_study'),
-    name: "累计学时",
-    other: "10 小时",
-    onClick: () => {
-    }
-  }
-];
 
 const tools: Tool[] = [
   {
@@ -79,6 +54,47 @@ const tools: Tool[] = [
 struct MinePage {
   @StorageProp('topArea')
   topArea: number = 0;
+  @Watch('watchUser')
+  @StorageProp(Auth.UserStoreKey)
+  user: User = Auth.getFakeAuth();
+  @State
+  navs: Nav[] = [
+    {
+      icon: $r('app.media.ic_mine_history'),
+      name: "历史记录",
+      onClick: () => {
+      }
+    },
+    {
+      icon: $r('app.media.ic_mine_collect'),
+      name: "我的收藏",
+      onClick: () => {
+      }
+    },
+    {
+      icon: $r('app.media.ic_mine_like'),
+      name: "我的点赞",
+      onClick: () => {
+      }
+    },
+    {
+      icon: $r('app.media.ic_mine_study'),
+      name: "累计学时",
+      other: formatTime(this.user.totalTime ?? 0),
+      onClick: () => {
+      }
+    }
+  ];
+
+  watchUser() {
+    this.navs[3] = {
+      icon: $r('app.media.ic_mine_study'),
+      name: "累计学时",
+      other: formatTime(this.user.totalTime ?? 0),
+      onClick: () => {
+      }
+    }
+  }
 
   @Builder
   navBuilder(nav: Nav) {
@@ -146,9 +162,9 @@ struct MinePage {
           .width(55)
           .aspectRatio(1)
           .borderRadius(55)
-        if (false) {
+        if (this.user.token) {
           Column({ space: 4 }) {
-            Text('用户名')
+            Text(this.user.nickName ?? this.user.username)
               .fontSize(18)
               .fontWeight(500)
               .maxLines(1)
@@ -185,7 +201,7 @@ struct MinePage {
       .margin({ top: this.topArea })
 
       GridRow({ columns: 4 }) {
-        ForEach(navs, (nav: Nav) => {
+        ForEach(this.navs, (nav: Nav) => {
           this.navBuilder(nav)
         })
       }
@@ -200,6 +216,16 @@ struct MinePage {
       }
       .borderRadius(8)
       .backgroundColor($r('app.color.white'))
+
+      if (this.user.token) {
+        Button('退出登录')
+          .onClick(() => {
+            auth.clear();
+            router.pushUrl({
+              url: 'pages/LoginPage'
+            })
+          })
+      }
     }
     .width('100%')
     .height('100%')
@@ -208,8 +234,7 @@ struct MinePage {
     .linearGradient({
       colors: [["#ffb071", 0], [$r('app.color.common_gray_bg'), 0.3], [$r('app.color.common_gray_bg'), 1]]
     })
-    .onVisibleAreaChange([0, 1], (isVisible, currentRatio) => {
-      Logger.info(currentRatio.toString())
+    .onVisibleAreaChange([0, 1], (isVisible) => {
       if (isVisible) {
         StatusBar.setLightBar();
       } else {

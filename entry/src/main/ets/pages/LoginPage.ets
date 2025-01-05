@@ -1,4 +1,8 @@
 import { YoNavBar } from '../commons/components';
+import { promptAction, router } from '@kit.ArkUI';
+import { User } from '../models';
+import request from '../commons/utils/request';
+import { auth } from '../commons/utils/Auth';
 
 @Extend(TextInput)
 function customStyle() {
@@ -13,13 +17,50 @@ function customStyle() {
   })
 }
 
+interface LoginData {
+  username: string;
+  password: string;
+}
+
 @Entry
 @Component
 struct LoginPage {
-  @State mobile: string = 'yozica';
-  @State code: string = '';
+  @State mobile: string = 'hmheima';
+  @State code: string = 'Hmheima%123';
   @State isAgree: boolean = false;
   @State loading: boolean = false;
+
+  async login() {
+    if (!this.mobile) {
+      return promptAction.showToast({ message: "请输入用户名" });
+    }
+    if (!this.code) {
+      return promptAction.showToast({ message: "请输入密码" });
+    }
+    if (!this.isAgree) {
+      return promptAction.showToast({ message: "请阅读并同意用户协议" });
+    }
+    this.loading = true;
+    try {
+      const res = await request<User, LoginData>({
+        url: "/login",
+        method: "POST",
+        data: {
+          username: this.mobile,
+          password: this.code
+        }
+      })
+      auth.setUser(res);
+      router.back();
+    } catch (e) {
+      if (e && e.message) {
+        promptAction.showToast({ message: e.message });
+      } else {
+        promptAction.showToast({ message: '网络错误' });
+      }
+    }
+    this.loading = false;
+  }
 
   build() {
     Column() {
@@ -88,6 +129,7 @@ struct LoginPage {
         })
         .stateEffect(false)
         .onClick(() => {
+          this.login()
         })
       }
       .padding({ left: 16, right: 16, top: 30 })

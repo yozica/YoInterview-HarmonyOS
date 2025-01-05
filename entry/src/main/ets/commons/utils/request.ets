@@ -1,5 +1,6 @@
-import axios from '@ohos/axios';
+import axios, { AxiosError, AxiosProxyConfig, AxiosRequestConfig, InternalAxiosRequestConfig } from '@ohos/axios';
 import type { AxiosResponse } from '@ohos/axios';
+import { auth } from './Auth';
 
 interface ResType<T> {
   code: 10000 | number;
@@ -19,6 +20,16 @@ const service = axios.create({
   baseURL: "https://api-harmony-teach.itheima.net/hm",
   timeout: 5000,
 })
+
+service.interceptors.request.use(
+  (config: InternalAxiosRequestConfig) => {
+    config.headers['Authorization'] = 'Bearer ' + auth.getUser().token;
+    return config;
+  },
+  (err: AxiosError) => {
+    return Promise.reject(AxiosError);
+  }
+)
 
 const request = async<Res, Req = Object>(options: RequestOptions<Req>) => {
   const response = await service<null, AxiosResponse<ResType<Res>, Req>, Req>({
