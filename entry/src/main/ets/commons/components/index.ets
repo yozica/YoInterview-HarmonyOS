@@ -5,5 +5,6 @@ import YoSkeleton from './YoSkeleton/YoSkeleton';
 import YoSkeletonItem from './YoSkeletonItem/YoSkeletonItem';
 import QuestionItemComp from './QuestionItemComp/QuestionItemComp';
 import QuestionListComp from './QuestionListComp/QuestionListComp';
+import YoNavBar from './YoNavBar/YoNavBar';
 
-export { YoSearchBox, YoClockIn, YoTag, YoSkeleton, YoSkeletonItem, QuestionItemComp, QuestionListComp };
+export { YoSearchBox, YoClockIn, YoTag, YoSkeleton, YoSkeletonItem, YoNavBar, QuestionItemComp, QuestionListComp };
