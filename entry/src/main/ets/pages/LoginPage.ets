@@ -3,6 +3,8 @@ import { promptAction, router } from '@kit.ArkUI';
 import { User } from '../models';
 import request from '../commons/utils/request';
 import { auth } from '../commons/utils/Auth';
+import { emitter } from '@kit.BasicServicesKit';
+import { LOGIN_EVENT_NAME } from '../commons/contants';
 
 @Extend(TextInput)
 function customStyle() {
@@ -51,6 +53,7 @@ struct LoginPage {
         }
       })
       auth.setUser(res);
+      emitter.emit(LOGIN_EVENT_NAME);
       router.back();
     } catch (e) {
       if (e && e.message) {

@@ -3,6 +3,8 @@ import { QuestionListComp, YoSkeleton, YoSkeletonItem } from '../../../commons/c
 import request from '../../../commons/utils/request';
 import { FilterButton } from './components';
 import { LengthMetrics, LengthUnit } from "@kit.ArkUI";
+import { emitter } from "@kit.BasicServicesKit";
+import { LOGIN_EVENT_NAME } from "../../../commons/contants";
 
 @Extend(Text)
 function textTitle() {
@@ -29,6 +31,9 @@ struct HomeCategory {
 
   aboutToAppear(): void {
     this.getQuestionTypeList();
+    emitter.on(LOGIN_EVENT_NAME, () => {
+      this.getQuestionTypeList();
+    })
   }
 
   async getQuestionTypeList() {
